@@ -1,1 +1,6 @@
-# Todo App Requirements
+# bibliotekas kas tiek izmantotas:
+# - tkinter (for GUI)
+# - json (for data storage)
+# - os (for file operations)
+#
+# Python version >= 3.6 recommended

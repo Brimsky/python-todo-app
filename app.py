@@ -7,26 +7,28 @@ import json
 import os
 from datetime import datetime
 
+# Šeit tiek izveidota klase ar mūsdienīgu dizainu
 class ModernUI:
-    # Modern color palette
-    PRIMARY = "#3498db"       # Main brand color (blue)
-    SECONDARY = "#2ecc71"     # Success/confirmation color (green)
-    DANGER = "#e74c3c"        # Destructive/warning color (red)
-    DARK = "#34495e"          # Dark text/elements
-    LIGHT = "#ecf0f1"         # Light background
-    WHITE = "#ffffff"         # Pure white
-    GRAY = "#95a5a6"          # Neutral/disabled color
+    # Krāsu palete - lai programma izskatītos smuki
+    PRIMARY = "#3498db"       # Zila krāsa pogām
+    SECONDARY = "#2ecc71"     # Zaļa krāsa pabeigšanas pogai
+    DANGER = "#e74c3c"        # Sarkana krāsa dzēšanas pogai
+    DARK = "#34495e"          # Tumša krāsa tekstam
+    LIGHT = "#ecf0f1"         # Gaiša krāsa fonam
+    WHITE = "#ffffff"         # Balta krāsa
+    GRAY = "#95a5a6"          # Pelēka krāsa mazāk svarīgām lietām
     
-    # Font settings
+    # Fontu iestatījumi - izmanto Helvetica, jo tas izskatās moderni
     FONT_FAMILY = "Helvetica"
     
-    # Button styles
+    # Pogu stils - tās izskatās labāk ar aizpildījumu
     BTN_PADDING_X = 15
     BTN_PADDING_Y = 8
     
-    # Rounded corners for buttons (using flat relief and specific backgrounds)
+    # Pogām ir plakans izskats - tā ir modernāk
     BTN_RELIEF = tk.FLAT
 
+# Galvenā klase, kas veido visu lietotni
 class TodoApp:
     def __init__(self, root):
         self.root = root
@@ -34,44 +36,43 @@ class TodoApp:
         self.root.geometry("550x600")
         self.root.minsize(500, 500)
         
-        # Set theme colors
+        # Izmanto modernās krāsas no ModernUI klases
         self.ui = ModernUI()
         self.root.configure(bg=self.ui.LIGHT)
         
-        # Set app icon (if available)
+        # Mēģina iestatīt ikonu, ja tāda ir
         try:
-            # Attempt to set an icon - this is optional and platform-dependent
-            self.root.iconbitmap("todo_icon.ico")  # You would need to create this icon file
+            self.root.iconbitmap("todo_icon.ico")
         except:
             pass
         
-        # Data storage
+        # Kur glabāt uzdevumus - saglabā JSON failā
         self.todo_file = "todos.json"
         self.todos = self.load_todos()
         
-        # Create GUI elements
+        # Izveido visus logrīkus
         self.create_widgets()
         
     def create_widgets(self):
-        # Main container with padding
+        # Galvenais konteiners ar aizpildījumu malās
         container = tk.Frame(self.root, bg=self.ui.LIGHT)
         container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # App header with shadow effect
+        # Aplikācijas augšdaļa ar nosaukumu
         header_frame = tk.Frame(container, bg=self.ui.LIGHT)
         header_frame.pack(fill=tk.X, pady=(0, 20))
         
-        # App logo/title
+        # Aplikācijas nosaukums ar ķeksīša ikonu
         title_label = tk.Label(
             header_frame, 
-            text="✓ My Tasks",
+            text="✓ Mani Uzdevumi",
             font=(self.ui.FONT_FAMILY, 22, "bold"), 
             fg=self.ui.DARK,
             bg=self.ui.LIGHT
         )
         title_label.pack(side=tk.LEFT)
         
-        # Current date display
+        # Šodienas datums labajā pusē
         date_str = datetime.now().strftime("%B %d, %Y")
         date_label = tk.Label(
             header_frame,
@@ -82,11 +83,11 @@ class TodoApp:
         )
         date_label.pack(side=tk.RIGHT, pady=10)
         
-        # Search and add container
+        # Ievades lauks un poga uzdevumu pievienošanai
         input_container = tk.Frame(container, bg=self.ui.LIGHT)
         input_container.pack(fill=tk.X, pady=(0, 15))
         
-        # Stylish input with border and rounded corners
+        # Skaists ievades lauks ar apmali
         input_frame = tk.Frame(
             input_container, 
             bg=self.ui.WHITE,
@@ -96,7 +97,7 @@ class TodoApp:
         )
         input_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
         
-        # Input icon
+        # Ikona pie ievades lauka
         task_icon = tk.Label(
             input_frame, 
             text="➕", 
@@ -106,7 +107,7 @@ class TodoApp:
         )
         task_icon.pack(side=tk.LEFT, padx=10)
         
-        # Todo input
+        # Ievades lauks jauniem uzdevumiem
         self.todo_entry = tk.Entry(
             input_frame, 
             font=(self.ui.FONT_FAMILY, 12),
@@ -116,28 +117,28 @@ class TodoApp:
         )
         self.todo_entry.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, ipady=10)
         self.todo_entry.bind("<Return>", lambda event: self.add_todo())
-        self.todo_entry.insert(0, "Add a new task...")
+        self.todo_entry.insert(0, "Pievienot jaunu uzdevumu...")
         self.todo_entry.config(fg=self.ui.GRAY)
         
-        # Clear placeholder on focus
+        # Notīra tekstu, kad uzklikšķina uz lauka
         def on_entry_focus_in(event):
-            if self.todo_entry.get() == "Add a new task...":
+            if self.todo_entry.get() == "Pievienot jaunu uzdevumu...":
                 self.todo_entry.delete(0, tk.END)
                 self.todo_entry.config(fg=self.ui.DARK)
                 
-        # Restore placeholder on focus out if empty
+        # Atjauno tekstu, ja lauks ir tukšs un vairs nav fokusā
         def on_entry_focus_out(event):
             if not self.todo_entry.get():
-                self.todo_entry.insert(0, "Add a new task...")
+                self.todo_entry.insert(0, "Pievienot jaunu uzdevumu...")
                 self.todo_entry.config(fg=self.ui.GRAY)
                 
         self.todo_entry.bind("<FocusIn>", on_entry_focus_in)
         self.todo_entry.bind("<FocusOut>", on_entry_focus_out)
         
-        # Add button
+        # Poga uzdevumu pievienošanai
         add_button = tk.Button(
             input_container,
-            text="Add Task",
+            text="Pievienot",
             command=self.add_todo,
             bg=self.ui.PRIMARY,
             fg=self.ui.WHITE,
@@ -149,21 +150,21 @@ class TodoApp:
         )
         add_button.pack(side=tk.RIGHT)
         
-        # Task counts
+        # Uzdevumu skaitītājs - cik pabeigti, cik vēl jāizpilda
         stats_frame = tk.Frame(container, bg=self.ui.LIGHT)
         stats_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Todo count label (updated in refresh_todo_list)
+        # Skaitītāja teksts (tiks atjaunots vēlāk)
         self.count_label = tk.Label(
             stats_frame,
-            text="",  # Will be set in refresh_todo_list
+            text="",  # Tiks iestatīts refresh_todo_list funkcijā
             font=(self.ui.FONT_FAMILY, 10),
             fg=self.ui.GRAY,
             bg=self.ui.LIGHT
         )
         self.count_label.pack(side=tk.LEFT)
         
-        # Task list frame with white background and border
+        # Uzdevumu saraksta rāmis ar baltu fonu un apmali
         list_container = tk.Frame(
             container, 
             bg=self.ui.WHITE,
@@ -173,17 +174,17 @@ class TodoApp:
         )
         list_container.pack(fill=tk.BOTH, expand=True)
         
-        # Inner padding for list
+        # Iekšējā aizpildījums sarakstam
         list_frame = tk.Frame(list_container, bg=self.ui.WHITE)
         list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Scrollbar and Treeview for todo list
+        # Ritjosla un saraksts uzdevumiem
         scrollbar = ttk.Scrollbar(list_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Define Treeview style
+        # Saraksta stila iestatījumi
         style = ttk.Style()
-        style.theme_use('default')  # Reset theme for consistency
+        style.theme_use('default')  # Atiestatīt tēmu, lai būtu vienādi
         style.configure(
             "Treeview", 
             background=self.ui.WHITE,
@@ -199,12 +200,12 @@ class TodoApp:
             foreground=[('selected', self.ui.DARK)]
         )
         
-        # Remove borders
+        # Noņem apmales, lai izskatītos modernāk
         style.layout("Treeview", [
             ('Treeview.treearea', {'sticky': 'nswe'})
         ])
         
-        # Header style
+        # Galvenes stils
         style.configure(
             "Treeview.Heading",
             background=self.ui.LIGHT,
@@ -212,7 +213,7 @@ class TodoApp:
             font=(self.ui.FONT_FAMILY, 10, 'bold')
         )
         
-        # Create Treeview
+        # Izveido sarakstu ar kolonnām
         columns = ("Status", "Task", "Actions")
         self.todo_tree = ttk.Treeview(
             list_frame, 
@@ -222,9 +223,9 @@ class TodoApp:
             yscrollcommand=scrollbar.set
         )
         
-        # Configure columns
+        # Konfigurē kolonnas
         self.todo_tree.heading("Status", text="")
-        self.todo_tree.heading("Task", text="Task")
+        self.todo_tree.heading("Task", text="Uzdevums")
         self.todo_tree.heading("Actions", text="")
         
         self.todo_tree.column("Status", width=40, anchor="center")
@@ -234,18 +235,18 @@ class TodoApp:
         self.todo_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.todo_tree.yview)
         
-        # Add some tag configurations for visual variety
+        # Pievieno atzīmes, lai pabeigti uzdevumi būtu pelēki
         self.todo_tree.tag_configure('completed', foreground=self.ui.GRAY)
         self.todo_tree.tag_configure('odd_row', background=self.ui.LIGHT)
         
-        # Action buttons frame
+        # Pogu rāmis darbībām ar uzdevumiem
         action_frame = tk.Frame(container, bg=self.ui.LIGHT)
         action_frame.pack(fill=tk.X, pady=(15, 0))
         
-        # Complete button
+        # Pabeigšanas poga ar ķeksīti
         complete_button = tk.Button(
             action_frame,
-            text="✓ Complete",
+            text="✓ Pabeigt",
             command=self.toggle_complete,
             bg=self.ui.SECONDARY,
             fg=self.ui.WHITE,
@@ -257,10 +258,10 @@ class TodoApp:
         )
         complete_button.pack(side=tk.LEFT, padx=(0, 10))
         
-        # Edit button
+        # Rediģēšanas poga ar zīmuļa ikonu
         edit_button = tk.Button(
             action_frame,
-            text="✎ Edit",
+            text="✎ Rediģēt",
             command=self.edit_todo,
             bg=self.ui.PRIMARY,
             fg=self.ui.WHITE,
@@ -272,10 +273,10 @@ class TodoApp:
         )
         edit_button.pack(side=tk.LEFT, padx=(0, 10))
         
-        # Delete button
+        # Dzēšanas poga ar miskastes ikonu
         delete_button = tk.Button(
             action_frame,
-            text="🗑 Delete",
+            text="🗑 Dzēst",
             command=self.delete_todo,
             bg=self.ui.DANGER,
             fg=self.ui.WHITE,
@@ -287,33 +288,32 @@ class TodoApp:
         )
         delete_button.pack(side=tk.LEFT)
         
-        # Button hover effects (for all buttons)
+        # Pievieno pogu efektus, kad peles kursors ir virs tām
         for button in (add_button, complete_button, edit_button, delete_button):
             self.setup_button_hover(button)
         
-        # Double click to edit - FIXED to check for selection first
+        # Dubultklikšķis, lai rediģētu - vispirms pārbauda, vai ir atlasīts elements
         def on_double_click(event):
-            if self.todo_tree.selection():  # Only proceed if an item is selected
+            if self.todo_tree.selection():  # Turpina tikai, ja ir atlasīts uzdevums
                 self.edit_todo()
                 
         self.todo_tree.bind("<Double-1>", on_double_click)
         
-        # Right-click context menu
+        # Labā klikšķa izvēlne
         self.create_context_menu()
         
-        # Refresh todo list
+        # Atjauno uzdevumu sarakstu
         self.refresh_todo_list()
         
-        # Ensure clean exit
+        # Pareiza aizvēršana, lai saglabātu uzdevumus
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
     
     def setup_button_hover(self, button):
-        """Add hover effect to buttons"""
+        """Pievieno pogām efektu, kad peles kursors ir virs tām"""
         original_bg = button['background']
         
-        # Slightly darker on hover
+        # Nedaudz tumšāka krāsa, kad kursors ir virs pogas
         def on_enter(e):
-            # Create slightly darker color for hover effect
             r, g, b = button.winfo_rgb(original_bg)
             darker = f'#{int(r/256*0.9):02x}{int(g/256*0.9):02x}{int(b/256*0.9):02x}'
             button['background'] = darker
@@ -325,22 +325,22 @@ class TodoApp:
         button.bind("<Leave>", on_leave)
     
     def create_context_menu(self):
-        """Create right-click context menu"""
+        """Izveido labā klikšķa izvēlni"""
         self.context_menu = tk.Menu(self.root, tearoff=0, bg=self.ui.WHITE, fg=self.ui.DARK)
-        self.context_menu.add_command(label="Complete/Incomplete", command=self.toggle_complete)
-        self.context_menu.add_command(label="Edit Task", command=self.edit_todo)
+        self.context_menu.add_command(label="Pabeigt/Atsākt", command=self.toggle_complete)
+        self.context_menu.add_command(label="Rediģēt", command=self.edit_todo)
         self.context_menu.add_separator()
-        self.context_menu.add_command(label="Delete Task", command=self.delete_todo)
+        self.context_menu.add_command(label="Dzēst", command=self.delete_todo)
         
         def show_context_menu(event):
-            # Only show if there's a selection
+            # Parāda tikai, ja ir atlasīts uzdevums
             if self.todo_tree.selection():
                 self.context_menu.post(event.x_root, event.y_root)
                 
         self.todo_tree.bind("<Button-3>", show_context_menu)
     
     def load_todos(self):
-        """Load todos from JSON file"""
+        """Ielādē uzdevumus no JSON faila"""
         if os.path.exists(self.todo_file):
             try:
                 with open(self.todo_file, "r") as f:
@@ -350,20 +350,20 @@ class TodoApp:
         return []
     
     def save_todos(self):
-        """Save todos to JSON file"""
+        """Saglabā uzdevumus JSON failā"""
         with open(self.todo_file, "w") as f:
             json.dump(self.todos, f)
     
     def refresh_todo_list(self):
-        """Refresh the todo list display"""
-        # Clear current items
+        """Atjauno uzdevumu sarakstu"""
+        # Notīra visus tagadējos ierakstus
         for item in self.todo_tree.get_children():
             self.todo_tree.delete(item)
         
-        # Add todos to the treeview
+        # Pievieno uzdevumus sarakstam
         completed_count = 0
         for i, todo in enumerate(self.todos):
-            # Determine status icon and tags
+            # Nosaka statusu un atzīmes
             completed = todo.get("completed", False)
             if completed:
                 completed_count += 1
@@ -373,22 +373,22 @@ class TodoApp:
                 status = "○"
                 tags = ()
                 
-            # Add alternating row background
+            # Pievieno mainīgo fonu katrai otrajai rindai
             if i % 2 == 1:
                 tags = tags + ('odd_row',)
                 
             self.todo_tree.insert("", "end", iid=str(i), values=(status, todo["text"], ""), tags=tags)
         
-        # Update count label
+        # Atjauno skaitītāja tekstu
         total = len(self.todos)
-        self.count_label.config(text=f"{completed_count} completed, {total-completed_count} remaining")
+        self.count_label.config(text=f"{completed_count} pabeigti, {total-completed_count} aktīvi")
     
     def add_todo(self):
-        """Add a new todo"""
+        """Pievieno jaunu uzdevumu"""
         todo_text = self.todo_entry.get().strip()
         
-        # Don't add if it's the placeholder text
-        if todo_text == "Add a new task...":
+        # Nepievieno, ja tas ir noklusējuma teksts
+        if todo_text == "Pievienot jaunu uzdevumu...":
             return
             
         if todo_text:
@@ -397,21 +397,21 @@ class TodoApp:
             self.refresh_todo_list()
             self.todo_entry.delete(0, tk.END)
             
-            # Reset focus to input for quick multiple entries
+            # Atjauno fokusu uz ievades lauku, lai varētu ātri pievienot vairākus
             self.todo_entry.focus_set()
         else:
-            messagebox.showwarning("Warning", "Todo cannot be empty!")
+            messagebox.showwarning("Brīdinājums", "Uzdevums nevar būt tukšs!")
     
     def get_selected_todo_index(self):
-        """Get the index of the selected todo"""
+        """Iegūst atlasītā uzdevuma indeksu"""
         selection = self.todo_tree.selection()
         if not selection:
-            messagebox.showwarning("Warning", "Please select a todo first!")
+            messagebox.showwarning("Brīdinājums", "Lūdzu, atlasiet uzdevumu!")
             return None
         return int(selection[0])
     
     def toggle_complete(self):
-        """Toggle the completion status of the selected todo"""
+        """Pārslēdz uzdevuma pabeigšanas statusu"""
         index = self.get_selected_todo_index()
         if index is not None:
             self.todos[index]["completed"] = not self.todos[index].get("completed", False)
@@ -419,30 +419,30 @@ class TodoApp:
             self.refresh_todo_list()
     
     def edit_todo(self):
-        """Edit the selected todo"""
+        """Rediģē atlasīto uzdevumu"""
         index = self.get_selected_todo_index()
         if index is not None:
-            # Create a dialog for editing
+            # Izveido dialoglogu rediģēšanai
             edit_window = tk.Toplevel(self.root)
-            edit_window.title("Edit Task")
+            edit_window.title("Rediģēt uzdevumu")
             edit_window.geometry("450x150")
             edit_window.configure(bg=self.ui.LIGHT)
             edit_window.resizable(False, False)
             
-            # Add padding container
+            # Pievieno aizpildījuma konteineru
             edit_container = tk.Frame(edit_window, bg=self.ui.LIGHT, padx=20, pady=20)
             edit_container.pack(fill=tk.BOTH, expand=True)
             
-            # Add editing widgets
+            # Pievieno rediģēšanas logrīkus
             tk.Label(
                 edit_container, 
-                text="Edit Task", 
+                text="Rediģēt uzdevumu", 
                 bg=self.ui.LIGHT, 
                 fg=self.ui.DARK,
                 font=(self.ui.FONT_FAMILY, 14, "bold")
             ).pack(anchor="w", pady=(0, 10))
             
-            # Create styled input field with border
+            # Izveido stilizētu ievades lauku ar apmali
             input_frame = tk.Frame(
                 edit_container, 
                 bg=self.ui.WHITE,
@@ -463,7 +463,7 @@ class TodoApp:
             edit_entry.insert(0, self.todos[index]["text"])
             edit_entry.select_range(0, tk.END)
             
-            # Buttons container
+            # Pogu konteiners
             button_frame = tk.Frame(edit_container, bg=self.ui.LIGHT)
             button_frame.pack(fill=tk.X)
             
@@ -475,12 +475,12 @@ class TodoApp:
                     self.refresh_todo_list()
                     edit_window.destroy()
                 else:
-                    messagebox.showwarning("Warning", "Task cannot be empty!")
+                    messagebox.showwarning("Brīdinājums", "Uzdevums nevar būt tukšs!")
             
-            # Cancel button
+            # Atcelšanas poga
             cancel_button = tk.Button(
                 button_frame,
-                text="Cancel",
+                text="Atcelt",
                 command=edit_window.destroy,
                 bg=self.ui.LIGHT,
                 fg=self.ui.DARK,
@@ -492,10 +492,10 @@ class TodoApp:
             )
             cancel_button.pack(side=tk.LEFT, padx=(0, 10))
             
-            # Save button
+            # Saglabāšanas poga
             save_button = tk.Button(
                 button_frame,
-                text="Save",
+                text="Saglabāt",
                 command=save_edit,
                 bg=self.ui.PRIMARY,
                 fg=self.ui.WHITE,
@@ -507,24 +507,24 @@ class TodoApp:
             )
             save_button.pack(side=tk.LEFT)
             
-            # Add hover effects
+            # Pievieno pogu efektus
             self.setup_button_hover(cancel_button)
             self.setup_button_hover(save_button)
             
-            # Bind Enter key to save
+            # Enter taustiņš, lai saglabātu
             edit_entry.bind("<Return>", lambda event: save_edit())
             
-            # Make dialog modal AFTER it's fully created
-            edit_window.update()  # Force update of the window
+            # Padara dialoglogu modālu PĒC tā izveidošanas
+            edit_window.update()  # Atjauno logu
             
-            # Make the window transient for the main window
+            # Padara logu atkarīgu no galvenā loga
             edit_window.transient(self.root)
             
-            # Set grab only after window is updated/visible
-            edit_window.focus_set()  # Set focus to the window
-            edit_window.grab_set()   # Make it modal
+            # Iestata saķeršanu tikai pēc loga atjaunošanas
+            edit_window.focus_set()  # Iestata fokusu uz logu
+            edit_window.grab_set()   # Padara to modālu
             
-            # Center the dialog window
+            # Centrē dialoglogu
             edit_window.update_idletasks()
             width = edit_window.winfo_width()
             height = edit_window.winfo_height()
@@ -532,25 +532,25 @@ class TodoApp:
             y = (self.root.winfo_height() // 2) - (height // 2) + self.root.winfo_y()
             edit_window.geometry(f"{width}x{height}+{x}+{y}")
             
-            # Set focus to the entry field after window is fully configured
+            # Iestata fokusu uz ievades lauku
             edit_entry.focus_set()
     
     def delete_todo(self):
-        """Delete the selected todo"""
+        """Dzēš atlasīto uzdevumu"""
         index = self.get_selected_todo_index()
         if index is not None:
-            # Create confirmation dialog
+            # Izveido apstiprinājuma dialoglogu
             confirm_window = tk.Toplevel(self.root)
-            confirm_window.title("Confirm Deletion")
+            confirm_window.title("Apstiprināt dzēšanu")
             confirm_window.geometry("400x150")
             confirm_window.configure(bg=self.ui.LIGHT)
             confirm_window.resizable(False, False)
             
-            # Add padding container
+            # Pievieno aizpildījuma konteineru
             confirm_container = tk.Frame(confirm_window, bg=self.ui.LIGHT, padx=20, pady=20)
             confirm_container.pack(fill=tk.BOTH, expand=True)
             
-            # Warning icon and message
+            # Brīdinājuma ikona un ziņojums
             message_frame = tk.Frame(confirm_container, bg=self.ui.LIGHT)
             message_frame.pack(fill=tk.X, pady=(0, 15))
             
@@ -565,7 +565,7 @@ class TodoApp:
             
             message_text = tk.Label(
                 message_frame,
-                text="Are you sure you want to delete this task?",
+                text="Vai tiešām vēlaties dzēst šo uzdevumu?",
                 font=(self.ui.FONT_FAMILY, 12),
                 bg=self.ui.LIGHT,
                 fg=self.ui.DARK,
@@ -574,14 +574,14 @@ class TodoApp:
             )
             message_text.pack(side=tk.LEFT, fill=tk.BOTH)
             
-            # Buttons container
+            # Pogu konteiners
             button_frame = tk.Frame(confirm_container, bg=self.ui.LIGHT)
             button_frame.pack(fill=tk.X)
             
-            # Cancel button
+            # Atcelšanas poga
             cancel_button = tk.Button(
                 button_frame,
-                text="Cancel",
+                text="Atcelt",
                 command=confirm_window.destroy,
                 bg=self.ui.LIGHT,
                 fg=self.ui.DARK,
@@ -593,7 +593,7 @@ class TodoApp:
             )
             cancel_button.pack(side=tk.RIGHT, padx=(10, 0))
             
-            # Delete button
+            # Dzēšanas poga
             def confirm_delete():
                 del self.todos[index]
                 self.save_todos()
@@ -602,7 +602,7 @@ class TodoApp:
                 
             delete_button = tk.Button(
                 button_frame,
-                text="Delete",
+                text="Dzēst",
                 command=confirm_delete,
                 bg=self.ui.DANGER,
                 fg=self.ui.WHITE,
@@ -614,21 +614,21 @@ class TodoApp:
             )
             delete_button.pack(side=tk.RIGHT)
             
-            # Add hover effects
+            # Pievieno pogu efektus
             self.setup_button_hover(cancel_button)
             self.setup_button_hover(delete_button)
             
-            # Make dialog modal AFTER it's fully created
-            confirm_window.update()  # Force update of the window
+            # Padara dialoglogu modālu PĒC tā izveidošanas
+            confirm_window.update()  # Atjauno logu
             
-            # Make the window transient for the main window
+            # Padara logu atkarīgu no galvenā loga
             confirm_window.transient(self.root)
             
-            # Set grab only after window is updated/visible
-            confirm_window.focus_set()  # Set focus to the window
-            confirm_window.grab_set()   # Make it modal
+            # Iestata saķeršanu tikai pēc loga atjaunošanas
+            confirm_window.focus_set()  # Iestata fokusu uz logu
+            confirm_window.grab_set()   # Padara to modālu
             
-            # Center the dialog window
+            # Centrē dialoglogu
             confirm_window.update_idletasks()
             width = confirm_window.winfo_width()
             height = confirm_window.winfo_height()
@@ -637,10 +637,11 @@ class TodoApp:
             confirm_window.geometry(f"{width}x{height}+{x}+{y}")
     
     def on_closing(self):
-        """Handle window closing event"""
+        """Apstrādā loga aizvēršanas notikumu"""
         self.save_todos()
         self.root.destroy()
 
+# Programmas palaišana
 if __name__ == "__main__":
     root = tk.Tk()
     app = TodoApp(root)
